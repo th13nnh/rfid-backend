@@ -1,0 +1,35 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Guest {
+  id              String   @id @default(uuid())
+  rfid_card_id    String   @unique
+  first_name      String
+  last_name       String
+  job_position    String?
+  branch_location String?
+  join_date       DateTime @default(now())
+  photo_url       String?
+  is_vip          Boolean  @default(false)
+  created_at      DateTime @default(now())
+  updated_at      DateTime @updatedAt
+
+  check_ins CheckIn[]
+}
+
+model CheckIn {
+  id                  String   @id @default(uuid())
+  rfid_card_id        String
+  first_tap_timestamp DateTime
+  tap_timestamps      Json     @default("[]")  // Array of all timestamps
+  created_at          DateTime @default(now())
+  updated_at          DateTime @updatedAt
+
+  guest Guest @relation(fields: [rfid_card_id], references: [rfid_card_id])
+}
